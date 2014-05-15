@@ -1,0 +1,115 @@
+# Reproducible Research: Peer Assessment 1
+
+This document represents the solution to the Peer Assignment 1 project for the 
+Reproducible Research class.
+
+The solution consists of a sequence of basic data processing tasks. The detailed 
+description of the data set and the requirements for each processing step are
+presented in the [instructions](https://github.com/onlineclass/RepData_PeerAssessment1/blob/master/original.repo.README.md) document.
+
+In the implementation of this solution, I chose to use only the base plotting system
+
+
+## Loading and preprocessing the data
+
+Load the data and store it in the data frame object **activity**
+
+
+```r
+activity <- read.csv("activity.csv", stringsAsFactors = F)
+```
+
+
+
+## What is mean total number of steps taken per day?
+
+Use **tapply** function to create an array of total number of steps for each day and 
+then plot the daily activity histogram
+
+
+```r
+activity.daily <- tapply(activity$steps, activity$date, sum, simplify = T)
+hist(activity.daily, main = "Activity (NA values removed)", xlab = "Daily total steps", 
+    ylab = "Frequency [Days]", col = "red")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
+
+The mean and median values of the daily totla steps are simply computed using the **mean** and **median** functions applied to the **activity.daily** (the NA values will be removed - **na.rm = T**)
+
+
+```r
+activity.daily.median <- median(activity.daily, na.rm = T)
+activity.daily.mean <- mean(activity.daily, na.rm = T)
+```
+
+
+
+```r
+activity.daily.median
+```
+
+```
+## [1] 10765
+```
+
+
+
+```r
+activity.daily.mean
+```
+
+```
+## [1] 10766
+```
+
+
+## What is the average daily activity pattern?
+
+The following steps will create the timeseries plot of the average number of 
+steps in each 5-minute interval: 
+* remove all **NA** rows from the original data and store the filtered set in **activity.interval**.
+* create a new data frame - **activity.interval.avg** - using the **tapply** with the **mean** function
+* plot **mean_steps** column as a function of **interval**
+
+
+```r
+activity.interval <- activity[!is.na(activity$steps), ]
+
+activity.interval.avg <- data.frame(interval = as.numeric(levels(as.factor(activity.interval$interval))), 
+    mean_steps = tapply(activity.interval$steps, activity.interval$interval, 
+        mean))
+
+plot(activity.interval.avg$interval, activity.interval.avg$mean_steps, type = "l", 
+    main = "5-minute interval - average steps", xlab = "interval", ylab = "average steps")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+
+
+
+The maximum activity interval will be determined with the following statement:
+
+
+```r
+maximum.activity.interval <- activity.interval.avg[activity.interval.avg$mean_steps == 
+    max(activity.interval.avg$mean_steps), 1]
+
+maximum.activity.interval
+```
+
+```
+## [1] 835
+```
+
+
+
+
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
